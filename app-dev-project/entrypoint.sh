@@ -1,4 +1,4 @@
-#!/bin/sh
+
 ##########################################################################################
 ##  Summary:
 ## Since the web service is dependent not only on the container being up and running 
