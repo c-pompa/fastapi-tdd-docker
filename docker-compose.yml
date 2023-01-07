@@ -3,10 +3,11 @@ version: '3.8'
 services:
   web:
     build: ./app-dev-project
-    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 80
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
     volumes:
       - ./app-dev-project:/usr/src/app
     ports:
+      - 8004:8000
       - 80:80
       - 443:443
       - 22:22
@@ -14,8 +15,8 @@ services:
     environment:
       - ENVIRONMENT=dev
       - TESTING=0
-      - DATABASE_URL=postgres://postgres:postgres@web-db:5432/web_dev        # new [change]
-      - DATABASE_TEST_URL=postgres://postgres:postgres@web-db:5432/web_test  # new [change]
+      - DATABASE_URL=postgres://postgres:postgres@web-db:5432/web_dev      
+      - DATABASE_TEST_URL=postgres://postgres:postgres@web-db:5432/web_test  
     depends_on:   # new
       - web-db
 

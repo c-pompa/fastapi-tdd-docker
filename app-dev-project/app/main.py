@@ -1,5 +1,5 @@
 import logging
-import os
+# import os
 from datetime import datetime, timedelta
 from enum import Enum
 from typing import List, Union
@@ -15,11 +15,11 @@ from flask import Flask, escape, request
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, ValidationError
-from tortoise.contrib.fastapi import register_tortoise
+# from tortoise.contrib.fastapi import register_tortoise
 
 from app.api import ping, summaries
 from app.config import Settings, get_settings
-from app.db import init_db
+# from app.db import init_db
 
 log = logging.getLogger("uvicorn")
 
@@ -27,15 +27,13 @@ flask_app = Flask(__name__)
 
 # to get a string like this run:
 # openssl rand -hex 32
-SECRET_KEY = "8f1d962e29d034b96f0516e258b9baa89f47a18cc37f1c62be9f7a8df4c06987"
+SECRET_KEY = "REPLACE_WITH_OPENSSL_HEX_KEY"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-##Create a utility function to hash a password coming from the user.
-##And another utility to verify if a received password matches the hash stored.
-##And another one to authenticate and return a user.
-
-
+# Create a utility function to hash a password coming from the user.
+# And another utility to verify if a received password matches the hash stored.
+# And another one to authenticate and return a user.
 fake_users_db = {
     "johndoe": {
         "username": "johndoe",
@@ -53,9 +51,6 @@ fake_users_db = {
     },
 }
 
-# def fake_hash_password(password: str):
-#     return "fakehashed" + password
-
 
 class Token(BaseModel):
     access_token: str
@@ -67,20 +62,17 @@ class TokenData(BaseModel):
     scopes: List[str] = []
 
 
-## Model: User
+#  Model: User
 class User(BaseModel):
     username: str
     email: str | None = None
     full_name: str | None = None
     disabled: bool | None = None
 
-
 class UserInDB(User):
     hashed_password: str
 
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="token",
@@ -88,22 +80,18 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 
 ###################################################################################
-## Flask App Execute. Front End
-##
+#  Flask App Execute. Front End
 @flask_app.route("/")
 def flask_main():
     name = request.args.get("name", "chris")
     return f"Hello, {escape(name)} from Flask!"
 
-
 ###################################################################################
 
 ###################################################################################
-## FastAPI App Execute. Back End
-##
+#  FastAPI App Execute. Back End
 app = FastAPI()
 ###################################################################################
-
 
 @app.get("/v2")
 def read_main():
@@ -151,13 +139,6 @@ class reportNames(str, Enum):
     lenet = "lenet"
 
 
-# def fake_decode_token(token):
-#     # This doesn't provide any security at all
-#     # Check the next version
-#     user = get_user(fake_users_db, token)
-#     return user
-
-
 async def get_current_user(
     security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme)
 ):
@@ -201,11 +182,11 @@ async def get_current_active_user(
 
 
 ##################################################################
-## ROUTES
+#  ROUTES
 ##################################################################
 
-## Default: Root
-## To Do: show all api routes, user login, reports to access
+#  Default: Root
+#  To Do: show all api routes, user login, reports to access
 @app.get("/")
 async def root(settings: Settings = Depends(get_settings)):
     return {
@@ -217,8 +198,7 @@ async def root(settings: Settings = Depends(get_settings)):
 
 
 ####################################################################
-## Tests stuff - delete
-
+#  Tests stuff - delete
 
 def create_application() -> FastAPI:
     application = FastAPI()
@@ -229,9 +209,7 @@ def create_application() -> FastAPI:
 
     return application
 
-
 ####################################################################
-
 
 @app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
