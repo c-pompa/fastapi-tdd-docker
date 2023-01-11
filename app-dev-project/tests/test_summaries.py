@@ -13,9 +13,8 @@ Start with asking yourself what you want to test. Then make a function.
 
 
 import json
-
 import pytest
-
+from app.api import summaries
 
 def test_create_summary(test_app_with_db):
     response = test_app_with_db.post(

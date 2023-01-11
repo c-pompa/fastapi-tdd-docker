@@ -8,9 +8,6 @@ services:
       - ./app-dev-project:/usr/src/app
     ports:
       - 8004:8000
-      - 80:80
-      - 443:443
-      - 22:22
       
     environment:
       - ENVIRONMENT=dev
