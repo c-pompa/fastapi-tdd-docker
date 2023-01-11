@@ -3,6 +3,7 @@ FROM python:3.10.8-slim-buster
 
 # create directory for the app user
 RUN mkdir -p /home/app
+RUN mkdir -p /usr/src/app
 
 # create the app user
 RUN addgroup --system app && adduser --system --group app
@@ -48,6 +49,7 @@ FROM python:3.10.8-slim-buster
 
 # create directory for the app user
 RUN mkdir -p /home/app
+RUN mkdir -p /home/app/web
 
 # create the app user
 RUN addgroup --system app && adduser --system --group app
