@@ -11,21 +11,32 @@ It's worth noting that we used the async declaration here since the database com
 """
 from typing import List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Path, BackgroundTasks
 
 from app.api import crud
 from app.models.pydantic import SummaryPayloadSchema, SummaryResponseSchema
 from app.models.tortoise import SummarySchema
 
+
 router = APIRouter()
 
 
+# @router.post("/", response_model=SummaryResponseSchema, status_code=201)
+# async def create_summary(payload: SummaryPayloadSchema) -> SummaryResponseSchema:
+#     summary_id = await crud.post(payload)
+
+#     response_object = {"id": summary_id, "url": payload.url}
+#     return response_object
 @router.post("/", response_model=SummaryResponseSchema, status_code=201)
-async def create_summary(payload: SummaryPayloadSchema) -> SummaryResponseSchema:
+async def create_summary(payload: SummaryPayloadSchema, background_tasks: BackgroundTasks) -> SummaryResponseSchema:
     summary_id = await crud.post(payload)
+
+    background_tasks.add_task("dummy", summary_id, payload.url)
 
     response_object = {"id": summary_id, "url": payload.url}
     return response_object
+
+
 
 
 ## 2. Update [Summaries] in /api
