@@ -1,52 +1,18 @@
-# project/app/api/summaries.py
-"""
-Here, we defined a handler that expects a payload, payload: SummaryPayloadSchema, with a URL.
-
-Essentially, when the route is hit with a POST request, FastAPI will read the body of the request and validate the data:
-
-    If valid, the data will be available in the payload parameter. FastAPI also generates JSON Schema definitions that are then used to automatically generate the OpenAPI schema and the API documentation.
-    If invalid, an error is immediately returned.
-
-It's worth noting that we used the async declaration here since the database communication will be asynchronous. In other words, there are no blocking I/O operations in the handler.
-"""
 from typing import List
 
-from fastapi import APIRouter, HTTPException, Path, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Path
 
 from app.api import crud
-from app.models.pydantic import SummaryPayloadSchema, SummaryResponseSchema
 from app.models.tortoise import SummarySchema
+# from app.summarizer import generate_summary
 
+from app.models.pydantic import (  # isort:skip
+    SummaryPayloadSchema,
+    SummaryResponseSchema,
+    SummaryUpdatePayloadSchema,
+)
 
 router = APIRouter()
-
-
-# @router.post("/", response_model=SummaryResponseSchema, status_code=201)
-# async def create_summary(payload: SummaryPayloadSchema) -> SummaryResponseSchema:
-#     summary_id = await crud.post(payload)
-
-#     response_object = {"id": summary_id, "url": payload.url}
-#     return response_object
-@router.post("/", response_model=SummaryResponseSchema, status_code=201)
-async def create_summary(payload: SummaryPayloadSchema, background_tasks: BackgroundTasks) -> SummaryResponseSchema:
-    summary_id = await crud.post(payload)
-
-    background_tasks.add_task("dummy", summary_id, payload.url)
-
-    response_object = {"id": summary_id, "url": payload.url}
-    return response_object
-
-
-
-
-## 2. Update [Summaries] in /api
-@router.get("/{id}/", response_model=SummarySchema)
-async def read_summary(id: int) -> SummarySchema:
-    summary = await crud.get(id)
-    if not summary:
-        raise HTTPException(status_code=404, detail="Summary not found")
-
-    return summary
 
 
 @router.get("/", response_model=List[SummarySchema])
@@ -54,3 +20,44 @@ async def read_all_summaries() -> List[SummarySchema]:
     return await crud.get_all()
 
 
+@router.get("/{id}/", response_model=SummarySchema)
+async def read_summary(id: int = Path(..., gt=0)) -> SummarySchema:
+    summary = await crud.get(id)
+    if not summary:
+        raise HTTPException(status_code=404, detail="Summary not found")
+
+    return summary
+
+
+@router.post("/", response_model=SummaryResponseSchema, status_code=201)
+async def create_summary(
+    payload: SummaryPayloadSchema, background_tasks: BackgroundTasks
+) -> SummaryResponseSchema:
+    summary_id = await crud.post(payload)
+
+    background_tasks.add_task("dummy", summary_id, payload.url, payload.summary)
+
+    response_object = {"id": summary_id, "url": payload.url, "summary": payload.summary}
+    return response_object
+
+
+@router.put("/{id}/", response_model=SummarySchema)
+async def update_summary(
+    payload: SummaryUpdatePayloadSchema, id: int = Path(..., gt=0)
+) -> SummarySchema:
+    summary = await crud.put(id, payload)
+    if not summary:
+        raise HTTPException(status_code=404, detail="Summary not found")
+
+    return summary
+
+
+@router.delete("/{id}/", response_model=SummaryResponseSchema)
+async def delete_summary(id: int = Path(..., gt=0)) -> SummaryResponseSchema:
+    summary = await crud.get(id)
+    if not summary:
+        raise HTTPException(status_code=404, detail="Summary not found")
+
+    await crud.delete(id)
+
+    return summary
