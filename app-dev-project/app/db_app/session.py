@@ -1,3 +1,11 @@
+# from sqlalchemy import create_engine
+# from sqlalchemy.orm import sessionmaker
+
+# from app.core.config import settings
+
+# engine = create_engine(settings.SQLALCHEMY_DATABASE_URI, pool_pre_ping=True)
+# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 # project/app/db.py
 import logging 
 import os
@@ -24,7 +32,7 @@ def init_db(app: FastAPI) -> None:
     register_tortoise(
         app,
         db_url=os.environ.get("DATABASE_URL"),
-        modules={"models": ["app.models.tortoise"]},
+        modules={"models": ["app.models.user_tortoise","app.models.tortoise"]},
         generate_schemas=True,
         add_exception_handlers=True,
     )
@@ -35,7 +43,7 @@ async def generate_schema() -> None:
 
     await Tortoise.init(
         db_url=os.environ.get("DATABASE_URL"),
-        modules={"models": ["models.tortoise"]},
+        modules={"models": ["models.user_tortoise","models.tortoise"]},
     )
     log.info("Generating database schema via Tortoise...")
     await Tortoise.generate_schemas()
