@@ -1,4 +1,5 @@
 import secrets
+import os
 from typing import Any, Dict, List, Optional, Union
 import logging
 from functools import lru_cache
@@ -9,7 +10,7 @@ log = logging.getLogger("uvicorn")
 class Settings(BaseSettings):
     environment: str = "dev"
     testing: bool = 0
-    database_url: AnyHttpUrl = None
+    database_url: AnyHttpUrl  = "http://localhost:5432"
 
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = secrets.token_urlsafe(32)

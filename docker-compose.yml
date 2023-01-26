@@ -14,6 +14,7 @@ services:
       - TESTING=0
       - DATABASE_URL=postgres://postgres:postgres@web-db:5432/web_dev
       - DATABASE_TEST_URL=postgres://postgres:postgres@web-db:5432/web_test
+      # - LABEL org.opencontainers.image.source https://github.com/c-pompa/fastapi-tdd-docker
     env_file:
       - .env
     depends_on:

@@ -1,29 +1,19 @@
 from typing import Any, List
-
 from fastapi import APIRouter, BackgroundTasks, HTTPException,Body, Depends, Path
-from fastapi.encoders import jsonable_encoder
-from pydantic.networks import EmailStr
-
-from app.api import crud
-
-from app.models.user_tort import UserSchema 
-from app.models.user_pydantic import (  # isort:skip
-    UserPayloadSchema,
-    # UserResponseSchema,
-    # UserUpdatePayloadSchema,
-)
-
-
-# from typing import Any, List
-# from fastapi import APIRouter, Body, Depends, HTTPException
+from app.crud import crud_user
 # from fastapi.encoders import jsonable_encoder
 # from pydantic.networks import EmailStr
-# from sqlalchemy.orm import Session
+from app.models.user_tort import UserSchema, UserIn_Schema, Users  ## Tort + Pydantic
+from app.models.user_pydantic import (  # isort:skip
+    UserPayloadSchema,
+    UserResponseSchema
+    # UserUpdatePayloadSchema,
+)
+# from app.core.config import settings  ## App Env variables
 
-# from app import crud, models, schemas
-from app.api import deps
-from app.core.config import settings
-from app.utils import send_new_account_email
+# from app.api import deps
+# from app.utils import send_new_account_email
+
 
 router = APIRouter()
 
@@ -40,11 +30,28 @@ router = APIRouter()
 #     users = crud.user.get_multi(db, skip=skip, limit=limit)
 #     return users
 
+
 @router.get("/", response_model=List[UserSchema])
 async def read_all_users() -> List[UserSchema]:
-    return await crud.get_all()
+    return await crud_user.get_all()
 
 
+# @router.post("/users", response_model=UserSchema)
+# async def create_user(user: UserIn_Schema):
+#     user_obj = await Users.create(**user.dict(exclude_unset=True))
+#     return await UserSchema.from_tortoise_orm(user_obj)
+
+# @router.post("/", response_model=UserResponseSchema, status_code=201)
+# async def create_user(
+#     payload: UserPayloadSchema, background_tasks: BackgroundTasks
+# ) -> UserResponseSchema:
+#     user_id = await crud_user.post(payload)
+
+#     background_tasks.add_task('Test Data', user_id, payload.firstname)
+
+#     response_object = {"id": user_id, "firstname": payload.firstname}
+#     return 
+    
 # @router.post("/", response_model=UserResponseSchema, status_code=201)
 # async def create_summary(
 #     payload: UserPayloadSchema, background_tasks: BackgroundTasks
@@ -57,7 +64,7 @@ async def read_all_users() -> List[UserSchema]:
 #     return response_object
 
 
-# @router.post("/", response_model=schemas.User)
+# @router.post("/", response_model=UserSchema)
 # def create_user(
 #     *,
 #     db: Session = Depends(deps.get_db),

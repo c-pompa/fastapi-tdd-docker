@@ -5,7 +5,7 @@ import os
 from fastapi import FastAPI
 from tortoise.contrib.fastapi import register_tortoise
 from app.api import ping, summaries
-from app.db import init_db
+from app.db_app.init_db import init_db
 from app.core.config import settings
 from app.api.api_v1.api import api_router
 from starlette.middleware.cors import CORSMiddleware
