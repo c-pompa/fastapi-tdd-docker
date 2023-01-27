@@ -36,10 +36,10 @@ async def read_all_users() -> List[UserSchema]:
     return await crud_user.get_all()
 
 
-# @router.post("/users", response_model=UserSchema)
-# async def create_user(user: UserIn_Schema):
-#     user_obj = await Users.create(**user.dict(exclude_unset=True))
-#     return await UserSchema.from_tortoise_orm(user_obj)
+@router.post("/", response_model=UserSchema, status_code=201)
+async def create_user(user: UserIn_Schema):
+    user_obj = await Users.create(**user.dict(exclude_unset=True))
+    return await UserSchema.from_tortoise_orm(user_obj)
 
 # @router.post("/", response_model=UserResponseSchema, status_code=201)
 # async def create_user(
@@ -86,6 +86,14 @@ async def read_all_users() -> List[UserSchema]:
 #             email_to=user_in.email, username=user_in.email, password=user_in.password
 #         )
 #     return user
+
+ 
+
+# @router.get("/me/", response_model=UserSchema)
+# async def read_users_me(current_user: User = Depends(get_current_active_user)):
+#     return current_user
+
+
 
 
 # @router.put("/me", response_model=schemas.User)
